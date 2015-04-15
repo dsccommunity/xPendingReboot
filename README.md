@@ -1,6 +1,6 @@
-{{AppVeyor build status badge for master branch}}
+[![Build status](https://ci.appveyor.com/api/projects/status/25n3uaum4x6cv4dg/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xpendingreboot/branch/master)
 
-#{{ModuleName}}
+# xPendingReboot
 
 {{Description}}
 
