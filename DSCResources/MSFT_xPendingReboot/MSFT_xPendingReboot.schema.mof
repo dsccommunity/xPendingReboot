@@ -2,10 +2,19 @@
 class MSFT_xPendingReboot : OMI_BaseResource
 {
   [key] string Name;
+  boolean SkipComponentBasedServicing;
   [read] boolean ComponentBasedServicing;
+
+  boolean SkipWindowsUpdate;
   [read] boolean WindowsUpdate;
+
+  boolean SkipPendingFileRename;
   [read] boolean PendingFileRename;
+
+  boolean SkipPendingComputerRename;
   [read] boolean PendingComputerRename;
+
+  boolean SkipCcmClientSDK;
   [read] boolean CcmClientSDK;
 };
 
