@@ -45,7 +45,12 @@ Function Set-TargetResource
      param
     (
     [Parameter(Mandatory=$true)]
-    [string]$Name
+    [string]$Name,
+    [bool]$SkipComponentBasedServicing,
+    [bool]$SkipWindowsUpdate,
+    [bool]$SkipPendingFileRename,
+    [bool]$SkipPendingComputerRename,
+    [bool]$SkipCcmClientSDK
     )
 
     $global:DSCMachineStatus = 1
