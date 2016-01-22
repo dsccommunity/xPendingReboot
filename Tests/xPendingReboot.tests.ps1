@@ -16,19 +16,16 @@ Describe 'Test-TargetResource' {
     
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
-            Write-Host "Hi!"
             return @{ Name = 'RebootPending' }
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
-            Write-Host "Hi!"
             return @{ Name = 'RebootRequired' } 
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }
 
         # Used by PendingFileRename
         Mock Get-ItemProperty {
-            Write-Host "Hi!"
             return @{ PendingFileRenameOperations= @("File1", "File2") }
         } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }
 
