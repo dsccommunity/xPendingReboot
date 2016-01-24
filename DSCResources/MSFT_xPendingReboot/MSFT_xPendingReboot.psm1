@@ -14,7 +14,7 @@ Function Get-TargetResource
     $ActiveComputerName = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName').ComputerName
     $PendingComputerName = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName').ComputerName
     $PendingComputerRename = $ActiveComputerName -ne $PendingComputerName
-    
+
     $CCMSplat = @{
         NameSpace='ROOT\ccm\ClientSDK'
         Class='CCM_ClientUtilities'
@@ -72,56 +72,30 @@ Function Test-TargetResource
     [bool]$SkipCcmClientSDK
     )
 
-    if(-not $SkipComponentBasedServicing)
+    $status = Get-TargetResource $Name
+
+    if(-not $SkipComponentBasedServicing -and $status.ComponentBasedServicing)
     {
-        $ScriptBlocks += @{ComponentBasedServicing = {(Get-ChildItem 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name.Split("\") -contains "RebootPending"}}
+        Write-Verbose 'Pending component based servicing reboot found.'
+        return $false
     }
 
-    if(-not $SkipWindowsUpdate)
+    if(-not $SkipWindowsUpdate -and $status.WindowsUpdate)
     {
-        $ScriptBlocks += @{WindowsUpdate = {(Get-ChildItem 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\').Name.Split("\") -contains "RebootRequired"}}
+        Write-Verbose 'Pending Windows Update reboot found.'
+        return $false
     }
 
-    if(-not $SkipPendingFileRename)
+    if(-not $SkipPendingFileRename -and $status.PendingFileRename)
     {
-        $ScriptBlocks += @{PendingFileRename = {(Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\').PendingFileRenameOperations.Length -gt 0}}
+        Write-Verbose 'Pending file rename found.'
+        return $false
     }
 
-    if(-not $SkipPendingComputerRename)
+    if(-not $SkipPendingComputerRename -and $status.PendingComputerRename)
     {
-        $ScriptBlocks += @{PendingComputerRename = {
-                $ActiveComputerName = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName').ComputerName
-                $PendingComputerName = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName').ComputerName
-                $ActiveComputerName -ne $PendingComputerName
-            }
-        }
-    }
-
-    if(-not $SkipCcmClientSDK)
-    {
-        $ScriptBlocks += @{CcmClientSDK = {
-                $CCMSplat = @{
-                    NameSpace='ROOT\ccm\ClientSDK'
-                    Class='CCM_ClientUtilities'
-                    Name='DetermineIfRebootPending'
-                    ErrorAction='Stop'
-                }
-                Try {
-                    $CCMClientSDK = Invoke-WmiMethod @CCMSplat
-                    ($CCMClientSDK.ReturnValue -eq 0) -and ($CCMClientSDK.IsHardRebootPending -or $CCMClientSDK.RebootPending)
-                } Catch {
-                    Write-Warning "Unable to query CCM_ClientUtilities: $_"
-                }
-            }
-        }
-    }
-
-    Foreach ($Script in $ScriptBlocks.Keys) {
-        If (Invoke-Command $ScriptBlocks[$Script]) {
-            Write-Verbose "A pending reboot was found for $Script."
-            Write-Verbose 'Setting the DSCMachineStatus global variable to 1.'
-            return $false
-        }
+        Write-Verbose 'Pending computer rename found.'
+        return $false
     }
 
     Write-Verbose 'No pending reboots found.'
