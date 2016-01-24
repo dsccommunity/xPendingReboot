@@ -1,6 +1,7 @@
 Function Get-TargetResource
 {
     [CmdletBinding()]
+    [OutputType([Hashtable])
      param
     (
     [Parameter(Mandatory=$true)]
@@ -59,6 +60,7 @@ Function Set-TargetResource
 Function Test-TargetResource
 {
     [CmdletBinding()]
+    [OutputType([Boolean])]
      param
     (
     [Parameter(Mandatory=$true)]
