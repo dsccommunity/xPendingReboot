@@ -1,7 +1,7 @@
 Function Get-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Hashtable])
+    [OutputType([Hashtable])]
      param
     (
     [Parameter(Mandatory=$true)]
