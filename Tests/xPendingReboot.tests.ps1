@@ -1,6 +1,7 @@
 <# 
 .summary
     Test suite for MSFT_xPendingReboot.psm1
+    For PR https://github.com/PowerShell/xPendingReboot/pull/1 
 #>
 [CmdletBinding()]
 param()
@@ -16,43 +17,54 @@ Describe 'Get-TargetResource' {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
             return @{ Name = 'RebootPending' }
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }
+        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
             return @{ Name = 'RebootRequired' } 
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }
+        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
         Mock Get-ItemProperty {
             return @{ PendingFileRenameOperations= @("File1", "File2") }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }
+        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
          # Used by PendingComputerRename
         Mock Get-ItemProperty {
             return @{ ComputerName = "box2" }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }
+        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Get-ItemProperty {
             return @{ ComputerName = "box" }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }
+        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Invoke-WmiMethod {
-            return New-Object PSObject -Property
-                @{
+            return New-Object PSObject -Property @{
                     ReturnValue = 0
                     IsHardRebootPending = $false
                     RebootPending = $true
                 }
+        } -ModuleName "MSFT_xPendingReboot" -Verifiable
+
+        $value = Get-TargetResource -Name "Test"
+        It "All mocks were called" {
+            Assert-VerifiableMocks
+        }
+        
+        It "Component Based Servicing should be true" {
+            $value.ComponentBasedServicing | Should Be $true
         }
 
-        It "All methods should have returned pending reboots" {
-            $value = Get-TargetResource -Name "Test"
-            
+        It "WindowsUpdate should be true" {
             $value.ComponentBasedServicing | Should Be $true
-            $value.WindowsUpdate | Should Be $true
+        }
+        It "Pending File Rename should be true" {
             $value.PendingFileRename | Should Be $true
+        }
+        It "Pending Computer Rename should be true" {
             $value.PendingComputerRename | Should Be $true
+        }
+        It "Ccm Client SDK should be true" {
             $value.CcmClientSDK | Should Be $true
         }
     }
@@ -60,44 +72,52 @@ Describe 'Get-TargetResource' {
     Context "No Reboots Are Required" {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
-            return @{ }
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }
+            return @{ Name = '' }
+        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
-            return @{ } 
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }
+            return @{ Name = '' } 
+        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
         Mock Get-ItemProperty {
-            return @{ }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }
+            return @{ PendingFileRenameOperations= @() }
+        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
          # Used by PendingComputerRename
         Mock Get-ItemProperty {
-            return @{ ComputerName = "box" }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }
+            return @{  }
+        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Get-ItemProperty {
-            return @{ ComputerName = "box" }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }
+            return @{  }
+        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Invoke-WmiMethod {
-            return New-Object PSObject -Property
-                @{
+            return New-Object PSObject -Property @{
                     ReturnValue = 0
                     IsHardRebootPending = $false
-                    RebootPending = $true
+                    RebootPending = $false
                 }
+        } -ModuleName "MSFT_xPendingReboot" -Verifiable
+
+        $value = Get-TargetResource -Name "Test"
+        
+        It "Component Based Servicing should be false" {
+            $value.ComponentBasedServicing | Should Be $false
         }
 
-        It "All methods should have returned pending reboots" {
-            $value = Get-TargetResource -Name "Test"
-
+        It "WindowsUpdate should be false" {
             $value.ComponentBasedServicing | Should Be $false
-            $value.WindowsUpdate | Should Be $false
+        }
+        It "Pending File Rename should be false" {
             $value.PendingFileRename | Should Be $false
+        }
+        It "Pending Computer Rename should be false" {
             $value.PendingComputerRename | Should Be $false
+        }
+        It "Ccm Client SDK should be false" {
             $value.CcmClientSDK | Should Be $false
         }
     }
