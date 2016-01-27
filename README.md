@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/25n3uaum4x6cv4dg/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xpendingreboot/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/25n3uaum4x6cv4dg/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xpendingreboot/branch/master)
 
 # xPendingReboot
 
@@ -29,12 +29,20 @@ Details for all read-only properties are returned by Get-DscConfiguration
 * **Name**: Required parameter that must be unique per instance of the resource within a configuration.
 * **ComponentBasedServicing**: (Read-only) One of the locations that are examined by the resource.
 Details are returned by Get-DSCConfiguration.
+* **SkipComponentBasedServicing**: (Write) Skip reboots triggered by the Component-Based Servicing component.
 * **WindowsUpdate**: (Read-only) One of the locations that are examined by the resource.
+* **SkipWindowsUpdate**: (Write) Skip reboots triggered by Windows Update.
 * **PendingFileRename**: (Read-only) One of the locations that are examined by the resource.
+* **SkipPendingFileRename**: (Write) Skip pending file rename reboots.
 * **PendingComputerRename**: (Read-only) One of the locations that are examined by the resource.
+* **SkipCmmClientSDK**: (Write) Skip reboots triggered by the ConfigMgr client
 * **CcmClientSDK**: (Read-only) One of the locations that are examined by the resource.
 
 ## Versions
+
+### Unreleased
+* Added parameters which allow you to skip reboots triggered by the individual components. For example, you can choose not to
+	reboot if Windows Update requested a reboot.
 
 ### 0.1.0.2
 
