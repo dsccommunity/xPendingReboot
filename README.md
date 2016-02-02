@@ -41,6 +41,7 @@ Details are returned by Get-DSCConfiguration.
 ## Versions
 
 ### Unreleased
+
 * Added parameters which allow you to skip reboots triggered by the individual components. For example, you can choose not to
 	reboot if Windows Update requested a reboot.
 
