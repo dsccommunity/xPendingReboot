@@ -16,12 +16,12 @@ Describe 'Get-TargetResource' {
     Context "All Reboots Are Required" {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
-            return @{ Name = 'RebootPending' }
+            return @{ Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending' }
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
-            return @{ Name = 'RebootRequired' } 
+            return @{ Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' } 
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
@@ -72,12 +72,12 @@ Describe 'Get-TargetResource' {
     Context "No Reboots Are Required" {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
-            return @{ Name = '' }
+            <# return nothing to catch issue #4 #>
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
-            return @{ Name = '' } 
+            <# return nothing to catch issue #4 #>
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
@@ -120,6 +120,26 @@ Describe 'Get-TargetResource' {
         It "Ccm Client SDK should be false" {
             $value.CcmClientSDK | Should Be $false
         }
+    }
+    
+    Context "SkipCcmClientSdk" {
+        
+        It "Calls 'Invoke-WmiMethod' when 'SkipCcmClientSdk' is not specified" {
+            Mock Invoke-WmiMethod { } -ModuleName "MSFT_xPendingReboot"
+            
+            $value = Get-TargetResource -Name "Test" -SkipCcmClientSdk $false
+            
+            Assert-MockCalled Invoke-WmiMethod -Scope It -ModuleName "MSFT_xPendingReboot"
+        }
+        
+        It "Does not call 'Invoke-WmiMethod' when 'SkipCcmClientSdk' is specified" {
+            Mock Invoke-WmiMethod { } -ModuleName "MSFT_xPendingReboot"
+            
+            $value = Get-TargetResource -Name "Test" -SkipCcmClientSdk $true
+            
+            Assert-MockCalled Invoke-WmiMethod -Scope It -Exactly 0 -ModuleName "MSFT_xPendingReboot"
+        }
+         
     }
 }
 

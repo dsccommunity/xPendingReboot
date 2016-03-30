@@ -16,8 +16,8 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 The **xPendingReboot** module containes the **xPendingReboot** resource, which examines three specific registry locations where a Windows Server might indicate that a reboot is pending, and allows DSC to predictably handle the condition.
 DSC determines how to handle pending reboot conditions using the Local Configuration Management (LCM) setting RebootNodeIfNeeded. 
-When DSC resources require reboot, within a Set statement in a DSC Resource the global variable DSCMachineStatus is set to value “1”.
-When this condition occurs and RebootNodeIfNeeded is set to “True”, DSC reboots the machine after a successful Set.
+When DSC resources require reboot, within a Set statement in a DSC Resource the global variable DSCMachineStatus is set to value '1'.
+When this condition occurs and RebootNodeIfNeeded is set to 'True', DSC reboots the machine after a successful Set.
 Otherwise, the reboot is postponed.
 
 ## Resources
@@ -35,12 +35,17 @@ Details are returned by Get-DSCConfiguration.
 * **PendingFileRename**: (Read-only) One of the locations that are examined by the resource.
 * **SkipPendingFileRename**: (Write) Skip pending file rename reboots.
 * **PendingComputerRename**: (Read-only) One of the locations that are examined by the resource.
-* **SkipCmmClientSDK**: (Write) Skip reboots triggered by the ConfigMgr client
+* **SkipCcmClientSDK**: (Write) Skip reboots triggered by the ConfigMgr client
 * **CcmClientSDK**: (Read-only) One of the locations that are examined by the resource.
 
 ## Versions
 
 ### Unreleased
+
+### 0.3.0.0
+
+* Suppresses warning output in Test-TargetResource when 'SkipCcmClientSDK' is specified.
+* Fixes 'Null-valued expression' bug when 'Auto Update' or 'Component Based Servicing' registry keys are empty.
 
 ### 0.2.0.0
 
@@ -71,11 +76,11 @@ This configuration leverages xPendingReboot and sets the LCM setting to allow au
 ```powershell
 Configuration CheckForPendingReboot 
 {        
-    Node ‘NodeName’ 
+    Node 'NodeName' 
     {  
         xPendingReboot Reboot1
         { 
-            Name = ‘BeforeSoftwareInstall’
+            Name = 'BeforeSoftwareInstall'
         }
         LocalConfigurationManager
         {
@@ -93,11 +98,11 @@ It then leverages xPendingReboot and configures the LCM to allow automatic reboo
 ```powershell
 Configuration CheckForPendingReboot 
 {        
-    Node ‘NodeName’ 
+    Node 'NodeName' 
     {  
         xPendingReboot Reboot1
         { 
-            Name = ‘BeforeSoftwareInstall’
+            Name = 'BeforeSoftwareInstall'
         }
         LocalConfigurationManager
         {
