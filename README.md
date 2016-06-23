@@ -8,6 +8,9 @@ xPendingReboot examines three specific registry locations where a Windows Server
 Note: The expectation is that this resource will be used in conjunction with knowledge of DSC Local Configuration Manager, which has the ability to manage whether reboots happen automatically using the RebootIfNeeded parameter.
 For more information on configuring the LCM, please reference [this TechNet article](https://technet.microsoft.com/en-us/library/dn249922.aspx).
 
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
 
