@@ -44,6 +44,7 @@ Details are returned by Get-DSCConfiguration.
 ## Versions
 
 ### Unreleased
+* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 
 ### 0.3.0.0
 
