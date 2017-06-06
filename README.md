@@ -96,8 +96,7 @@ Configuration CheckForPendingReboot
 
 ### Identify if reboots are pending but do not automatically reboot (managed by DSC)
 
-This configuration will install the hotfix from a URI that is connected to a particular hotfix ID. 
-It then leverages xPendingReboot and configures the LCM to allow automatic reboots.
+This configuration leverages xPendingReboot and sets the LCM setting to disallow automatic reboots.
 
 ```powershell
 Configuration CheckForPendingReboot 
