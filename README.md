@@ -54,7 +54,7 @@ Details are returned by Get-DSCConfiguration.
 ### 0.2.0.0
 
 * Added parameters which allow you to skip reboots triggered by the individual components. For example, you can choose not to
-	reboot if Windows Update requested a reboot.
+    reboot if Windows Update requested a reboot.
 
 ### 0.1.0.2
 
@@ -79,19 +79,19 @@ This configuration leverages xPendingReboot and sets the LCM setting to allow au
 
 ```powershell
 Configuration CheckForPendingReboot 
-{        
-    Node 'NodeName' 
-    {  
+{
+    Node 'NodeName'
+    {
         xPendingReboot Reboot1
-        { 
+        {
             Name = 'BeforeSoftwareInstall'
         }
         LocalConfigurationManager
         {
             RebootNodeIfNeeded = $True
-        } 
-    }  
-} 
+        }
+    }
+}
 ```
 
 ### Identify if reboots are pending but do not automatically reboot (managed by DSC)
@@ -100,17 +100,17 @@ This configuration leverages xPendingReboot and sets the LCM setting to disallow
 
 ```powershell
 Configuration CheckForPendingReboot 
-{        
-    Node 'NodeName' 
-    {  
+{
+    Node 'NodeName'
+    {
         xPendingReboot Reboot1
-        { 
+        {
             Name = 'BeforeSoftwareInstall'
         }
         LocalConfigurationManager
         {
             RebootNodeIfNeeded = 'False'
-        } 
-    }  
-} 
+        }
+    }
+}
 ```
