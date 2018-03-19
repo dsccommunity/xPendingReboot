@@ -17,26 +17,26 @@ Describe 'Get-TargetResource' {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
             return @{ Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending' }
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
             return @{ Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' }
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
         Mock Get-ItemProperty {
             return @{ PendingFileRenameOperations= @("File1", "File2") }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
          # Used by PendingComputerRename
         Mock Get-ItemProperty {
             return @{ ComputerName = "box2" }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Get-ItemProperty {
             return @{ ComputerName = "box" }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Invoke-WmiMethod {
             return New-Object PSObject -Property @{
@@ -73,26 +73,26 @@ Describe 'Get-TargetResource' {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
             <# return nothing to catch issue #4 #>
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
             <# return nothing to catch issue #4 #>
-        } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
         Mock Get-ItemProperty {
             return @{ PendingFileRenameOperations= @() }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
          # Used by PendingComputerRename
         Mock Get-ItemProperty {
             return @{  }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Get-ItemProperty {
             return @{  }
-        } -ParameterFilter { $Path -eq 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
+        } -ParameterFilter { $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         Mock Invoke-WmiMethod {
             return New-Object PSObject -Property @{
