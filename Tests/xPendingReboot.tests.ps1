@@ -1,7 +1,7 @@
-<# 
+<#
 .summary
     Test suite for MSFT_xPendingReboot.psm1
-    For PR https://github.com/PowerShell/xPendingReboot/pull/1 
+    For PR https://github.com/PowerShell/xPendingReboot/pull/1
 #>
 [CmdletBinding()]
 param()
@@ -21,7 +21,7 @@ Describe 'Get-TargetResource' {
 
         # Used by WindowsUpdate
         Mock Get-ChildItem {
-            return @{ Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' } 
+            return @{ Name = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' }
         } -ParameterFilter { $Path -eq 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\' }  -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         # Used by PendingFileRename
@@ -48,27 +48,27 @@ Describe 'Get-TargetResource' {
 
         $value = Get-TargetResource -Name "Test"
         It "All mocks were called" {
-            Assert-VerifiableMocks
+            Assert-VerifiableMock
         }
-        
+
         It "Component Based Servicing should be true" {
-            $value.ComponentBasedServicing | Should Be $true
+            $value.ComponentBasedServicing | Should -Be $true
         }
 
         It "WindowsUpdate should be true" {
-            $value.ComponentBasedServicing | Should Be $true
+            $value.ComponentBasedServicing | Should -Be $true
         }
         It "Pending File Rename should be true" {
-            $value.PendingFileRename | Should Be $true
+            $value.PendingFileRename | Should -Be $true
         }
         It "Pending Computer Rename should be true" {
-            $value.PendingComputerRename | Should Be $true
+            $value.PendingComputerRename | Should -Be $true
         }
         It "Ccm Client SDK should be true" {
-            $value.CcmClientSDK | Should Be $true
+            $value.CcmClientSDK | Should -Be $true
         }
     }
-    
+
     Context "No Reboots Are Required" {
         # Used by ComponentBasedServicing
         Mock Get-ChildItem {
@@ -103,43 +103,43 @@ Describe 'Get-TargetResource' {
         } -ModuleName "MSFT_xPendingReboot" -Verifiable
 
         $value = Get-TargetResource -Name "Test"
-        
+
         It "Component Based Servicing should be false" {
-            $value.ComponentBasedServicing | Should Be $false
+            $value.ComponentBasedServicing | Should -Be $false
         }
 
         It "WindowsUpdate should be false" {
-            $value.ComponentBasedServicing | Should Be $false
+            $value.ComponentBasedServicing | Should -Be $false
         }
         It "Pending File Rename should be false" {
-            $value.PendingFileRename | Should Be $false
+            $value.PendingFileRename | Should -Be $false
         }
         It "Pending Computer Rename should be false" {
-            $value.PendingComputerRename | Should Be $false
+            $value.PendingComputerRename | Should -Be $false
         }
         It "Ccm Client SDK should be false" {
-            $value.CcmClientSDK | Should Be $false
+            $value.CcmClientSDK | Should -Be $false
         }
     }
-    
+
     Context "SkipCcmClientSdk" {
-        
+
         It "Calls 'Invoke-WmiMethod' when 'SkipCcmClientSdk' is not specified" {
             Mock Invoke-WmiMethod { } -ModuleName "MSFT_xPendingReboot"
-            
+
             $value = Get-TargetResource -Name "Test" -SkipCcmClientSdk $false
-            
+
             Assert-MockCalled Invoke-WmiMethod -Scope It -ModuleName "MSFT_xPendingReboot"
         }
-        
+
         It "Does not call 'Invoke-WmiMethod' when 'SkipCcmClientSdk' is specified" {
             Mock Invoke-WmiMethod { } -ModuleName "MSFT_xPendingReboot"
-            
+
             $value = Get-TargetResource -Name "Test" -SkipCcmClientSdk $true
-            
+
             Assert-MockCalled Invoke-WmiMethod -Scope It -Exactly 0 -ModuleName "MSFT_xPendingReboot"
         }
-         
+
     }
 }
 
@@ -160,13 +160,13 @@ Describe 'Test-TargetResource' {
         It "All Reboots are Skipped" {
             $result = Test-TargetResource -Name "Test" -SkipComponentBasedServicing $true -SkipWindowsUpdate $true -SkipPendingFileRename $true -SkipPendingComputerRename $true -SkipCcmClientSDK $true
 
-            $result | Should Be $true
+            $result | Should -Be $true
         }
 
         It "No Reboots are Skipped" {
             $result = Test-TargetResource -Name "Test" -SkipComponentBasedServicing $false -SkipWindowsUpdate $false -SkipPendingFileRename $false -SkipPendingComputerRename $false -SkipCcmClientSDK $false
 
-            $result | Should Be $false
+            $result | Should -Be $false
         }
     }
 }
