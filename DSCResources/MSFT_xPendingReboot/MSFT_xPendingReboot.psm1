@@ -6,12 +6,12 @@
     (
     [Parameter(Mandatory=$true)]
     [string]$Name,
-    
+
     [Parameter()]
     [bool]$SkipCcmClientSDK
     )
 
-    $ComponentBasedServicingKeys = (Get-ChildItem 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
+    $ComponentBasedServicingKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
     if ($ComponentBasedServicingKeys)
     {
         $ComponentBasedServicing = $ComponentBasedServicingKeys.Split("\") -contains "RebootPending"
@@ -21,7 +21,7 @@
         $ComponentBasedServicing = $false
     }
 
-    $WindowsUpdateKeys = (Get-ChildItem 'hklm:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\').Name
+    $WindowsUpdateKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\').Name
     if ($WindowsUpdateKeys)
     {
         $WindowsUpdate = $WindowsUpdateKeys.Split("\") -contains "RebootRequired"
@@ -31,12 +31,12 @@
         $WindowsUpdate = $false
     }
 
-    $PendingFileRename = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\Session Manager\').PendingFileRenameOperations.Length -gt 0
-    $ActiveComputerName = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName').ComputerName
-    $PendingComputerName = (Get-ItemProperty 'hklm:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName').ComputerName
+    $PendingFileRename = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\').PendingFileRenameOperations.Length -gt 0
+    $ActiveComputerName = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName').ComputerName
+    $PendingComputerName = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName').ComputerName
     $PendingComputerRename = $ActiveComputerName -ne $PendingComputerName
 
-    
+
 
     if (-not $SkipCcmClientSDK)
     {
@@ -46,7 +46,7 @@
             Name='DetermineIfRebootPending'
             ErrorAction='Stop'
         }
-        
+
         Try {
             $CCMClientSDK = Invoke-WmiMethod @CCMSplat
         }
