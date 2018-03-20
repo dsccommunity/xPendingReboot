@@ -2,13 +2,13 @@
 {
     [CmdletBinding()]
     [OutputType([Hashtable])]
-     param
+    param
     (
-    [Parameter(Mandatory=$true)]
-    [string]$Name,
+        [Parameter(Mandatory=$true)]
+        [string]$Name,
 
-    [Parameter()]
-    [bool]$SkipCcmClientSDK
+        [Parameter()]
+        [bool]$SkipCcmClientSDK
     )
 
     $ComponentBasedServicingKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
@@ -47,7 +47,8 @@
             ErrorAction='Stop'
         }
 
-        Try {
+        Try
+        {
             $CCMClientSDK = Invoke-WmiMethod @CCMSplat
         }
         Catch
@@ -71,15 +72,25 @@
 Function Set-TargetResource
 {
     [CmdletBinding()]
-     param
+    param
     (
-    [Parameter(Mandatory=$true)]
-    [string]$Name,
-    [bool]$SkipComponentBasedServicing,
-    [bool]$SkipWindowsUpdate,
-    [bool]$SkipPendingFileRename,
-    [bool]$SkipPendingComputerRename,
-    [bool]$SkipCcmClientSDK
+        [Parameter(Mandatory=$true)]
+        [string]$Name,
+
+        [Parameter()]
+        [bool]$SkipComponentBasedServicing,
+
+        [Parameter()]
+        [bool]$SkipWindowsUpdate,
+
+        [Parameter()]
+        [bool]$SkipPendingFileRename,
+
+        [Parameter()]
+        [bool]$SkipPendingComputerRename,
+
+        [Parameter()]
+        [bool]$SkipCcmClientSDK
     )
 
     $global:DSCMachineStatus = 1
@@ -89,15 +100,25 @@ Function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([Boolean])]
-     param
+    param
     (
-    [Parameter(Mandatory=$true)]
-    [string]$Name,
-    [bool]$SkipComponentBasedServicing,
-    [bool]$SkipWindowsUpdate,
-    [bool]$SkipPendingFileRename,
-    [bool]$SkipPendingComputerRename,
-    [bool]$SkipCcmClientSDK
+        [Parameter(Mandatory=$true)]
+        [string]$Name,
+
+        [Parameter()]
+        [bool]$SkipComponentBasedServicing,
+
+        [Parameter()]
+        [bool]$SkipWindowsUpdate,
+
+        [Parameter()]
+        [bool]$SkipPendingFileRename,
+
+        [Parameter()]
+        [bool]$SkipPendingComputerRename,
+
+        [Parameter()]
+        [bool]$SkipCcmClientSDK
     )
 
     $status = Get-TargetResource $Name -SkipCcmClientSDK $SkipCcmClientSDK
