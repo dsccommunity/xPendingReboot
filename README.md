@@ -1,6 +1,6 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/25n3uaum4x6cv4dg/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xpendingreboot/branch/master)
-
 # xPendingReboot
+
+[![Build status](https://ci.appveyor.com/api/projects/status/25n3uaum4x6cv4dg/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xpendingreboot/branch/master)
 
 The **xPendingReboot** contains the **xPendingReboot** DSC resource.
 xPendingReboot examines three specific registry locations where a Windows Server might indicate that a reboot is pending and allows DSC to predictably handle the condition.
@@ -13,7 +13,7 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 
 ## Contributing
 
-Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResources/blob/master/CONTRIBUTING.md).
 
 ## Description
 
@@ -31,9 +31,6 @@ Details for all read-only properties are returned by Get-DscConfiguration
 
 * **Name**: Required parameter that must be unique per instance of the resource within a configuration.
 * **ComponentBasedServicing**: (Read-only) One of the locations that are examined by the resource.
-
-Details are returned by Get-DSCConfiguration.
-
 * **SkipComponentBasedServicing**: (Write) Skip reboots triggered by the Component-Based Servicing component.
 * **WindowsUpdate**: (Read-only) One of the locations that are examined by the resource.
 * **SkipWindowsUpdate**: (Write) Skip reboots triggered by Windows Update.

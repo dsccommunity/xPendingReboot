@@ -5,10 +5,12 @@
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$Name,
+        [string]
+        $Name,
 
         [Parameter()]
-        [bool]$SkipCcmClientSDK
+        [bool]
+        $SkipCcmClientSDK
     )
 
     $ComponentBasedServicingKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
@@ -75,22 +77,28 @@ Function Set-TargetResource
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$Name,
+        [string]
+        $Name,
 
         [Parameter()]
-        [bool]$SkipComponentBasedServicing,
+        [bool]
+        $SkipComponentBasedServicing,
 
         [Parameter()]
-        [bool]$SkipWindowsUpdate,
+        [bool]
+        $SkipWindowsUpdate,
 
         [Parameter()]
-        [bool]$SkipPendingFileRename,
+        [bool]
+        $SkipPendingFileRename,
 
         [Parameter()]
-        [bool]$SkipPendingComputerRename,
+        [bool]
+        $SkipPendingComputerRename,
 
         [Parameter()]
-        [bool]$SkipCcmClientSDK
+        [bool]
+        $SkipCcmClientSDK
     )
 
     $global:DSCMachineStatus = 1
@@ -103,22 +111,28 @@ Function Test-TargetResource
     param
     (
         [Parameter(Mandatory=$true)]
-        [string]$Name,
+        [string]
+        $Name,
 
         [Parameter()]
-        [bool]$SkipComponentBasedServicing,
+        [bool]
+        $SkipComponentBasedServicing,
 
         [Parameter()]
-        [bool]$SkipWindowsUpdate,
+        [bool]
+        $SkipWindowsUpdate,
 
         [Parameter()]
-        [bool]$SkipPendingFileRename,
+        [bool]
+        $SkipPendingFileRename,
 
         [Parameter()]
-        [bool]$SkipPendingComputerRename,
+        [bool]
+        $SkipPendingComputerRename,
 
         [Parameter()]
-        [bool]$SkipCcmClientSDK
+        [bool]
+        $SkipCcmClientSDK
     )
 
     $status = Get-TargetResource $Name -SkipCcmClientSDK $SkipCcmClientSDK
