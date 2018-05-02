@@ -44,6 +44,8 @@ Details for all read-only properties are returned by Get-DscConfiguration
 
 ### Unreleased
 
+### 0.4.0.0
+
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 * Fixes registry not being evaluated correctly.
 * Fixes failing tests introduced in changes to Pester 4.
