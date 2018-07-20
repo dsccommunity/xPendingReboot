@@ -1,10 +1,9 @@
-﻿Function Get-TargetResource
-{
+﻿Function Get-TargetResource {
     [CmdletBinding()]
     [OutputType([Hashtable])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Name,
 
@@ -14,22 +13,18 @@
     )
 
     $ComponentBasedServicingKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
-    if ($ComponentBasedServicingKeys)
-    {
+    if ($ComponentBasedServicingKeys) {
         $ComponentBasedServicing = $ComponentBasedServicingKeys.Split("\") -contains "RebootPending"
     }
-    else
-    {
+    else {
         $ComponentBasedServicing = $false
     }
 
     $WindowsUpdateKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\').Name
-    if ($WindowsUpdateKeys)
-    {
+    if ($WindowsUpdateKeys) {
         $WindowsUpdate = $WindowsUpdateKeys.Split("\") -contains "RebootRequired"
     }
-    else
-    {
+    else {
         $WindowsUpdate = $false
     }
 
@@ -40,43 +35,39 @@
 
 
 
-    if (-not $SkipCcmClientSDK)
-    {
+    if (-not $SkipCcmClientSDK) {
         $CCMSplat = @{
-            NameSpace='ROOT\ccm\ClientSDK'
-            Class='CCM_ClientUtilities'
-            Name='DetermineIfRebootPending'
-            ErrorAction='Stop'
+            NameSpace   = 'ROOT\ccm\ClientSDK'
+            Class       = 'CCM_ClientUtilities'
+            Name        = 'DetermineIfRebootPending'
+            ErrorAction = 'Stop'
         }
 
-        Try
-        {
+        Try {
             $CCMClientSDK = Invoke-WmiMethod @CCMSplat
         }
-        Catch
-        {
+        Catch {
             Write-Warning "Unable to query CCM_ClientUtilities: $_"
         }
-    }
+    } #CCM_ClientUtilities querey
 
     $SCCMSDK = ($CCMClientSDK.ReturnValue -eq 0) -and ($CCMClientSDK.IsHardRebootPending -or $CCMClientSDK.RebootPending)
 
     return @{
-    Name = $Name
-    ComponentBasedServicing = $ComponentBasedServicing
-    WindowsUpdate = $WindowsUpdate
-    PendingFileRename = $PendingFileRename
-    PendingComputerRename = $PendingComputerRename
-    CcmClientSDK = $SCCMSDK
+        Name                    = $Name
+        ComponentBasedServicing = $ComponentBasedServicing
+        WindowsUpdate           = $WindowsUpdate
+        PendingFileRename       = $PendingFileRename
+        PendingComputerRename   = $PendingComputerRename
+        CcmClientSDK            = $SCCMSDK
     }
 }
 
-Function Set-TargetResource
-{
-    [CmdletBinding()]
+Function Set-TargetResource {
+    [CmdletBinding(SupportsShouldProcess)]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Name,
 
@@ -100,17 +91,15 @@ Function Set-TargetResource
         [bool]
         $SkipCcmClientSDK
     )
-
-    $global:DSCMachineStatus = 1
+    Set-Variable -Name DSCMachineStatus -Scope Global -Value 1
 }
 
-Function Test-TargetResource
-{
+Function Test-TargetResource {
     [CmdletBinding()]
     [OutputType([Boolean])]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Name,
 
@@ -137,26 +126,22 @@ Function Test-TargetResource
 
     $status = Get-TargetResource $Name -SkipCcmClientSDK $SkipCcmClientSDK
 
-    if(-not $SkipComponentBasedServicing -and $status.ComponentBasedServicing)
-    {
+    if (-not $SkipComponentBasedServicing -and $status.ComponentBasedServicing) {
         Write-Verbose 'Pending component based servicing reboot found.'
         return $false
     }
 
-    if(-not $SkipWindowsUpdate -and $status.WindowsUpdate)
-    {
+    if (-not $SkipWindowsUpdate -and $status.WindowsUpdate) {
         Write-Verbose 'Pending Windows Update reboot found.'
         return $false
     }
 
-    if(-not $SkipPendingFileRename -and $status.PendingFileRename)
-    {
+    if (-not $SkipPendingFileRename -and $status.PendingFileRename) {
         Write-Verbose 'Pending file rename found.'
         return $false
     }
 
-    if(-not $SkipPendingComputerRename -and $status.PendingComputerRename)
-    {
+    if (-not $SkipPendingComputerRename -and $status.PendingComputerRename) {
         Write-Verbose 'Pending computer rename found.'
         return $false
     }
@@ -167,4 +152,4 @@ Function Test-TargetResource
 
 Export-ModuleMember -Function *-TargetResource
 
-$regRebootLocations = $null
+Remove-Variable -Name regRebootLocations -ErrorAction Ignore
