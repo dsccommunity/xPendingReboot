@@ -1,155 +1,93 @@
-﻿Function Get-TargetResource {
-    [CmdletBinding()]
-    [OutputType([Hashtable])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Name,
+﻿[DscResource()]
 
-        [Parameter()]
-        [bool]
-        $SkipCcmClientSDK
-    )
+class xPendingReboot {
+    [DscProperty(Key)]
+    [string]$Name
 
-    $ComponentBasedServicingKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
-    if ($ComponentBasedServicingKeys) {
-        $ComponentBasedServicing = $ComponentBasedServicingKeys.Split("\") -contains "RebootPending"
+    [DscProperty()]
+    [boolean]$SkipComponentBasedServicing
+    [DscProperty(NotConfigurable)]
+    [boolean]$ComponentBasedServicing
+
+    [DscProperty()]
+    [boolean]$SkipWindowsUpdate
+    [DscProperty(NotConfigurable)]
+    [boolean]$WindowsUpdate
+
+    [DscProperty()]
+    [boolean]$SkipPendingFileRename
+    [DscProperty(NotConfigurable)]
+    [boolean]$PendingFileRename
+
+    [DscProperty()]
+    [boolean]$SkipPendingComputerRename
+    [DscProperty(NotConfigurable)]
+    [boolean]$PendingComputerRename
+
+    [DscProperty()]
+    [boolean]$SkipCcmClientSDK
+    [DscProperty(NotConfigurable)]
+    [boolean]$CcmClientSDK
+
+    [xPendingReboot] Get() {
+        $ComponentBasedServicingKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\').Name
+
+        $this.ComponentBasedServicing = $ComponentBasedServicingKeys -Split "\\" -contains "RebootPending"
+
+        $WindowsUpdateKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\').Name
+
+        $this.WindowsUpdate = $WindowsUpdateKeys -Split "\\" -contains "RebootRequired"
+
+        $this.PendingFileRename = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\').PendingFileRenameOperations.Length -gt 0
+        $ActiveComputerName = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName').ComputerName
+        $PendingComputerName = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName').ComputerName
+        $this.PendingComputerRename = $ActiveComputerName -ne $PendingComputerName
+
+        if (-not $this.SkipCcmClientSDK) {
+            $CCMSplat = @{
+                NameSpace   = 'ROOT\ccm\ClientSDK'
+                Class       = 'CCM_ClientUtilities'
+                Name        = 'DetermineIfRebootPending'
+                ErrorAction = 'Stop'
+            }
+            $this.CcmClientSDK = $(
+                Try {
+                    Invoke-WmiMethod @CCMSplat
+                }
+                Catch {
+                    Write-Warning "Unable to query CCM_ClientUtilities: $_"
+                }
+            ) | ForEach-Object {(($_.ReturnValue -eq 0) -and ($_.IsHardRebootPending -or $_.RebootPending))}
+        } #CCM_ClientUtilities querey
+
+        return $this
     }
-    else {
-        $ComponentBasedServicing = $false
+    Set() {
+        Set-Variable -Name DSCMachineStatus -Scope Global -Value 1
     }
+    [bool] Test() {
+        $status = $this.Get()
+        $Now = [datetime]::Now
+        $RebootsFound = $false
 
-    $WindowsUpdateKeys = (Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\').Name
-    if ($WindowsUpdateKeys) {
-        $WindowsUpdate = $WindowsUpdateKeys.Split("\") -contains "RebootRequired"
-    }
-    else {
-        $WindowsUpdate = $false
-    }
-
-    $PendingFileRename = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\').PendingFileRenameOperations.Length -gt 0
-    $ActiveComputerName = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName').ComputerName
-    $PendingComputerName = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName').ComputerName
-    $PendingComputerRename = $ActiveComputerName -ne $PendingComputerName
-
-
-
-    if (-not $SkipCcmClientSDK) {
-        $CCMSplat = @{
-            NameSpace   = 'ROOT\ccm\ClientSDK'
-            Class       = 'CCM_ClientUtilities'
-            Name        = 'DetermineIfRebootPending'
-            ErrorAction = 'Stop'
+        @(
+            @('ComponentBasedServicing', 'Pending component based servicing reboot found.'),
+            @('WindowsUpdate', 'Pending Windows Update reboot found.'),
+            @('PendingFileRename', 'Pending file rename found.'),
+            @('PendingComputerRename', 'Pending computer rename found.')
+        ) | ForEach-Object {
+            if (-not ($this[( -join ('Skip', $_[0]))]) -and $Status[$_[0]]) {
+                Write-Verbose $_[1]
+                Set-Variable -Name RebootsFound -Value $true
+            }
         }
-
-        Try {
-            $CCMClientSDK = Invoke-WmiMethod @CCMSplat
+        if (-not $RebootsFound) {
+            Write-Verbose 'No pending reboots found.'
+            return $true
         }
-        Catch {
-            Write-Warning "Unable to query CCM_ClientUtilities: $_"
+        else {
+            Write-Verbose 'Within Maintenance Window - Initiating Pending Reboots'
+            return $false
         }
-    } #CCM_ClientUtilities querey
-
-    $SCCMSDK = ($CCMClientSDK.ReturnValue -eq 0) -and ($CCMClientSDK.IsHardRebootPending -or $CCMClientSDK.RebootPending)
-
-    return @{
-        Name                    = $Name
-        ComponentBasedServicing = $ComponentBasedServicing
-        WindowsUpdate           = $WindowsUpdate
-        PendingFileRename       = $PendingFileRename
-        PendingComputerRename   = $PendingComputerRename
-        CcmClientSDK            = $SCCMSDK
     }
 }
-
-Function Set-TargetResource {
-    [CmdletBinding(SupportsShouldProcess)]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Name,
-
-        [Parameter()]
-        [bool]
-        $SkipComponentBasedServicing,
-
-        [Parameter()]
-        [bool]
-        $SkipWindowsUpdate,
-
-        [Parameter()]
-        [bool]
-        $SkipPendingFileRename,
-
-        [Parameter()]
-        [bool]
-        $SkipPendingComputerRename,
-
-        [Parameter()]
-        [bool]
-        $SkipCcmClientSDK
-    )
-    Set-Variable -Name DSCMachineStatus -Scope Global -Value 1
-}
-
-Function Test-TargetResource {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Name,
-
-        [Parameter()]
-        [bool]
-        $SkipComponentBasedServicing,
-
-        [Parameter()]
-        [bool]
-        $SkipWindowsUpdate,
-
-        [Parameter()]
-        [bool]
-        $SkipPendingFileRename,
-
-        [Parameter()]
-        [bool]
-        $SkipPendingComputerRename,
-
-        [Parameter()]
-        [bool]
-        $SkipCcmClientSDK
-    )
-
-    $status = Get-TargetResource $Name -SkipCcmClientSDK $SkipCcmClientSDK
-
-    if (-not $SkipComponentBasedServicing -and $status.ComponentBasedServicing) {
-        Write-Verbose 'Pending component based servicing reboot found.'
-        return $false
-    }
-
-    if (-not $SkipWindowsUpdate -and $status.WindowsUpdate) {
-        Write-Verbose 'Pending Windows Update reboot found.'
-        return $false
-    }
-
-    if (-not $SkipPendingFileRename -and $status.PendingFileRename) {
-        Write-Verbose 'Pending file rename found.'
-        return $false
-    }
-
-    if (-not $SkipPendingComputerRename -and $status.PendingComputerRename) {
-        Write-Verbose 'Pending computer rename found.'
-        return $false
-    }
-
-    Write-Verbose 'No pending reboots found.'
-    return $true
-}
-
-Export-ModuleMember -Function *-TargetResource
-
-Remove-Variable -Name regRebootLocations -ErrorAction Ignore

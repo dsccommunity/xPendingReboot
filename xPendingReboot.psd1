@@ -1,4 +1,6 @@
 @{
+RootModule = 'DSCResources\MSFT_xPendingReboot\MSFT_xPendingReboot.psm1'
+
 # Version number of this module.
 moduleVersion = '0.4.0.0'
 
@@ -29,11 +31,11 @@ FunctionsToExport = '*'
 # Cmdlets to export from this module
 CmdletsToExport = '*'
 
+DscResourcesToExport = @('MaintenanceWindow','MaintenanceReboot')
+
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
-
     PSData = @{
-
         # Tags applied to this module. These help with module discovery in online galleries.
         Tags = @('DesiredStateConfiguration', 'DSC', 'DSCResourceKit', 'DSCResource')
 
@@ -53,11 +55,6 @@ PrivateData = @{
 * Change layout of parameters to compile with style guide.
 
 '
-
     } # End of PSData hashtable
-
 } # End of PrivateData hashtable
 }
-
-
-
