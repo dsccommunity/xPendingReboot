@@ -86,7 +86,7 @@ class xPendingReboot {
             return $true
         }
         else {
-            Write-Verbose 'Within Maintenance Window - Initiating Pending Reboots'
+            Write-Verbose 'Initiating Pending Reboots'
             return $false
         }
     }
