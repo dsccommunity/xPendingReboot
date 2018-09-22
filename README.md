@@ -44,6 +44,10 @@ Details for all read-only properties are returned by Get-DscConfiguration
 
 ### Unreleased
 
+* Update appveyor.yml to use the default template.
+* Added default template files .codecov.yml, .gitattributes, and .gitignore, and
+  .vscode folder.
+
 ### 0.4.0.0
 
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
