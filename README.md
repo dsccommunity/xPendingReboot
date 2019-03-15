@@ -62,7 +62,8 @@ Details for all read-only properties are returned by Get-DscConfiguration
 
 ### 0.2.0.0
 
-* Added parameters which allow you to skip reboots triggered by the individual components. For example, you can choose not to reboot if Windows Update requested a reboot.
+* Added parameters which allow you to skip reboots triggered by the individual components. For example, you can choose not to
+    reboot if Windows Update requested a reboot.
 
 ### 0.1.0.2
 
@@ -85,7 +86,7 @@ Details for all read-only properties are returned by Get-DscConfiguration
 This configuration leverages xPendingReboot and sets the LCM setting to allow automatic reboots.
 
 ```powershell
-Configuration CheckForPendingReboot
+Configuration CheckForPendingReboot 
 {
     Node 'NodeName'
     {
@@ -103,11 +104,10 @@ Configuration CheckForPendingReboot
 
 ### Identify if reboots are pending but do not automatically reboot (managed by DSC)
 
-This configuration will install the hotfix from a URI that is connected to a particular hotfix ID.
-It then leverages xPendingReboot and configures the LCM to allow automatic reboots.
+This configuration leverages xPendingReboot and sets the LCM setting to disallow automatic reboots.
 
 ```powershell
-Configuration CheckForPendingReboot
+Configuration CheckForPendingReboot 
 {
     Node 'NodeName'
     {
