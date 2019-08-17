@@ -1,3 +1,9 @@
+# **THIS MODULE HAS BEEN DEPRECATED**
+
+It will no longer be released.
+Please use the 'PendingReboot' resource in [ComputerManagementDsc](https://github.com/PowerShell/ComputerManagementDsc)
+instead.
+
 # xPendingReboot
 
 [![Build status](https://ci.appveyor.com/api/projects/status/25n3uaum4x6cv4dg/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xpendingreboot/branch/master)
@@ -44,6 +50,8 @@ Details for all read-only properties are returned by Get-DscConfiguration
 
 ### Unreleased
 
+* THIS MODULE HAS BEEN DEPRECATED. It will no longer be released.
+  Please use the 'PendingReboot' resource in ComputerManagementDsc instead.
 * Update appveyor.yml to use the default template.
 * Added default template files .codecov.yml, .gitattributes, and .gitignore, and
   .vscode folder.
@@ -86,7 +94,7 @@ Details for all read-only properties are returned by Get-DscConfiguration
 This configuration leverages xPendingReboot and sets the LCM setting to allow automatic reboots.
 
 ```powershell
-Configuration CheckForPendingReboot 
+Configuration CheckForPendingReboot
 {
     Node 'NodeName'
     {
@@ -107,7 +115,7 @@ Configuration CheckForPendingReboot
 This configuration leverages xPendingReboot and sets the LCM setting to disallow automatic reboots.
 
 ```powershell
-Configuration CheckForPendingReboot 
+Configuration CheckForPendingReboot
 {
     Node 'NodeName'
     {
