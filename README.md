@@ -1,7 +1,7 @@
 # **THIS MODULE HAS BEEN DEPRECATED**
 
 It will no longer be released.
-Please use the 'PendingReboot' resource in [ComputerManagementDsc](https://github.com/PowerShell/ComputerManagementDsc)
+Please use the 'PendingReboot' resource in [ComputerManagementDsc](https://github.com/dsccommunity/ComputerManagementDsc)
 instead.
 
 # xPendingReboot
@@ -52,6 +52,7 @@ Details for all read-only properties are returned by Get-DscConfiguration
 
 * THIS MODULE HAS BEEN DEPRECATED. It will no longer be released.
   Please use the 'PendingReboot' resource in ComputerManagementDsc instead.
+* Correct path to ComputerManagementDsc resource in README.MD.
 * Update appveyor.yml to use the default template.
 * Added default template files .codecov.yml, .gitattributes, and .gitignore, and
   .vscode folder.
